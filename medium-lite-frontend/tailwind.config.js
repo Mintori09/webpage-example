@@ -1,26 +1,32 @@
-module.exports = {
+const config = {
+    // Đảm bảo Tailwind quét các file trong thư mục src/
+    content: [
+        "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/features/**/*.{js,ts,jsx,tsx,mdx}", // Đảm bảo quét Feature components
+    ],
     darkMode: "class",
     theme: {
         extend: {
             colors: {
-                "primary": "#1A1A1A",
-                "background": "#F8F8F8",
-                "surface": "#FFFFFF",
-                "subtle-border": "#E8E8E8",
-                "medium-emphasis": "#6B6B6B",
-                "high-emphasis": "#1A1A1A",
+                primary: "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
             },
             fontFamily: {
-                "sans": ["Inter", "sans-serif"]
-            },
-            boxShadow: {
-                'subtle': '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
+                display: ["var(--font-work-sans)"],
             },
             borderRadius: {
-                'DEFAULT': '4px',
-                'md': '4px',
-                'lg': '8px',
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
             },
         },
     },
-}
+    // Bắt buộc phải có vì code gốc sử dụng form-input
+    // plugins: [require("@tailwindcss/forms")],
+};
+
+export default config;
