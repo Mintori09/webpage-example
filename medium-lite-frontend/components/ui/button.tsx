@@ -1,31 +1,32 @@
-// src/components/ui/button.tsx
-import * as React from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "primary" | "outline";
+    variant?: "primary" | "ghost" | "outline";
+    rounded?: "full" | "default";
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = "primary", ...props }, ref) => {
-        const variants = {
-            primary: "bg-primary text-white hover:bg-primary/90 focus-visible:outline-primary",
-            outline: "border border-[#EAEAEA] dark:border-gray-700 bg-background-light dark:bg-background-dark text-[#1A1A1A] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800",
-        };
+export function Button({
+    children, className, variant = "ghost", rounded = "full", ...props
+}: ButtonProps) {
+    const variants = {
+        primary: "bg-primary text-white hover:bg-primary/90",
+        ghost: "bg-transparent text-[#6B6B6B] dark:text-gray-300 hover:text-[#1A1A1A] dark:hover:text-white",
+        outline: "border border-[#1A1A1A] dark:border-gray-500 text-[#1A1A1A] dark:text-gray-300 hover:bg-primary hover:text-white hover:border-primary"
+    };
 
-        return (
-            <button
-                ref={ref}
-                className={cn(
-                    "flex w-full items-center justify-center rounded-lg px-3 py-3 text-base font-semibold leading-6 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all disabled:opacity-50",
-                    variants[variant],
-                    className
-                )}
-                {...props}
-            />
-        );
-    }
-);
-Button.displayName = "Button";
-export { Button };
+    return (
+        <button
+            className={cn(
+                "flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden h-10 px-4 text-sm font-medium leading-normal transition-colors",
+                rounded === "full" ? "rounded-full" : "rounded-lg",
+                variants[variant],
+                className
+            )}
+            {...props}
+        >
+            <span className="truncate">{children}</span>
+        </button>
+    );
+}
 

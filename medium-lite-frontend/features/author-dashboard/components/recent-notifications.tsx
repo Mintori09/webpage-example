@@ -9,8 +9,6 @@ export async function RecentNotifications() {
 
     return (
         <Card>
-            {/* Giả định CardHeader của bạn nhận title prop như code gốc. 
-          Nếu dùng shadcn chuẩn, nên dùng <CardTitle> bên trong */}
             <CardHeader title="Notifications" />
             <CardContent className="flex flex-col gap-4">
                 {notifications.map((item) => (

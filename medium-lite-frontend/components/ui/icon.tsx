@@ -41,3 +41,6 @@ export const GoogleIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+export function Icon({ name, className }: { name: string; className?: string }) {
+    return <span className={`material-symbols-outlined ${className || ""}`}>{name}</span>;
+}

@@ -7,13 +7,21 @@ import { cn } from "@/lib/utils";
 interface AvatarProps {
     src?: string | null;
     alt?: string;
-    fallback: string;
     className?: string;
 }
 
-export function Avatar({ src, alt, fallback, className }: AvatarProps) {
+export function Avatar({ src, alt, className }: AvatarProps) {
     const [isError, setIsError] = useState(false);
     const [prevSrc, setPrevSrc] = useState(src);
+
+    const getInitials = (name: string) => {
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .slice(0, 2)
+            .join("")
+            .toUpperCase();
+    };
 
     // --- KỸ THUẬT: STATE DERIVATION (Thay thế useEffect) ---
     // Nếu src thay đổi so với lần render trước, reset lỗi ngay lập tức.
@@ -40,12 +48,10 @@ export function Avatar({ src, alt, fallback, className }: AvatarProps) {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"
                     onError={() => setIsError(true)}
-                // priority: Nên bật nếu avatar nằm above-the-fold (trên cùng trang)
-                // priority={true} 
                 />
             ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-500 font-medium text-xs">
-                    {fallback}
+                    {alt && getInitials(alt)}
                 </div>
             )}
         </div>
