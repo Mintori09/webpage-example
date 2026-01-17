@@ -1,0 +1,31 @@
+meta {
+  name: Registry
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/user/registry?name=Minh Trsi&password=123!@#qwe&email=mintori@gmail.com
+  body: json
+  auth: inherit
+}
+
+params:query {
+  name: Minh Trsi
+  password: 123!@#qwe
+  email: mintori@gmail.com
+}
+
+body:json {
+  {
+      "name": "Minh Trsi",
+      "email": "mintori@gmail.com",
+      "password": "Password123!",
+      "password_confirmation": "Password123!"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
