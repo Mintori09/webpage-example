@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class PostTaxonomy extends Model
 {
-   use HasFactory;
+    use HasFactory;
     protected $table = 'post_taxonomy';
-
     public $timestamps = false;
 
-    protected $primaryKey = ['post_id', 'taxonomy_type', 'taxonomy_id'];
+    // protected $primaryKey = [...];
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -21,7 +21,6 @@ class PostTaxonomy extends Model
         'taxonomy_type',
         'primary',
     ];
-
     public function post()
     {
         return $this->belongsTo(Post::class);
@@ -35,5 +34,23 @@ class PostTaxonomy extends Model
     public function tag()
     {
         return $this->belongsTo(Tag::class, 'taxonomy_id');
+    }
+
+    // Get the actual taxonomy (Category or Tag) based on taxonomy_type
+    public function taxonomy()
+    {
+        if ($this->taxonomy_type === 'category') {
+            return $this->category();
+        }
+        return $this->tag();
+    }
+
+    // Accessor to get the taxonomy data
+    public function getTaxonomyAttribute()
+    {
+        if ($this->taxonomy_type === 'category') {
+            return $this->category;
+        }
+        return $this->tag;
     }
 }

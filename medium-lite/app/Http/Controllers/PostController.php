@@ -31,8 +31,43 @@ class PostController extends Controller
         }
 
         return $this->successResponse([
-            "message" => "Get post successfully!",
+            "message" => "Get post with slug successfully!",
             "data"    => $post
         ], \Illuminate\Http\Response::HTTP_OK);
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->get('q');
+
+        if (!$keyword) {
+            return $this->errorResponse('Search query is required', Response::HTTP_BAD_REQUEST);
+        }
+
+        $posts = Post::where('status', 'published')
+            ->where(function ($query) use ($keyword) {
+                $query->where('title', 'LIKE', "%{$keyword}%")
+                    ->orWhere('body', 'LIKE', "%{$keyword}%");
+            })
+            ->with('user:id,name')
+            ->latest('published_at')
+            ->paginate(10);
+
+        return $this->successResponse($posts, 'Search results for: ' . $keyword);
+    }
+
+    public function userPosts($id)
+    {
+        $posts = Post::where('user_id', $id)
+            ->where('status', 'published')
+            ->with('user:id,name')
+            ->latest('published_at')
+            ->paginate(10);
+
+        if ($posts->isEmpty()) {
+            return $this->errorResponse('No posts found for this user', Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->successResponse($posts, 'User posts retrieved successfully');
     }
 }

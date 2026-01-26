@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rules;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UserController extends Controller
 {
@@ -21,14 +22,14 @@ class UserController extends Controller
         $user = User::where('email', $attr['email'])->first();
 
         if (!$user || Hash::check($attr['password'] . $user->password, $user->password === false) ){
-            return $this->errorResponse('Credentials do not match', Response::HTTP_UNAUTHORIZED);
+            return $this->errorResponse('Credentials do not match', ResponseAlias::HTTP_UNAUTHORIZED);
         }
 
         $data = [
             'token' => $user->createToken($attr['email'])->plainTextToken,
             'user' => $user
         ];
-        return $this->successResponse($data, Response::HTTP_OK);
+        return $this->successResponse($data, ResponseAlias::HTTP_OK);
     }
 
     public function registry(Request $request): JsonResponse {
@@ -52,33 +53,20 @@ class UserController extends Controller
             'message' => "Register successfully"
         ], Response::HTTP_CREATED);
     }
-//    public function logout(Request $request): JsonResponse {
-//        // Kiểm tra xem user có đang dùng token hợp lệ không
-//        if ($request->user()) {
-//            // Chỉ xóa token hiện tại đang sử dụng
-//            $request->user()->currentAccessToken()->delete();
-//
-//            return $this->successResponse([
-//                'message' => 'Logged out successfully'
-//            ], Response::HTTP_OK);
-//        }
-//
-//        return $this->errorResponse('Unauthenticated', Response::HTTP_UNAUTHORIZED);
-//    }
 
     public function logout(Request $request) : JsonResponse {
         if ($request->user()) {
             $request->user()->currentAccessToken()->delete();
             return $this->successResponse([
                 'message' => "Logged out successfully"
-            ], Response::HTTP_OK);
+            ], ResponseAlias::HTTP_OK);
         }
         return $this->errorResponse([
             'message' => 'Unauthenticated'
-        ], Response::HTTP_UNAUTHORIZED);
+        ], ResponseAlias::HTTP_UNAUTHORIZED);
     }
 
     public function profile(Request $request): JsonResponse {
-        return $this->successResponse($request->user(), Response::HTTP_OK);
+        return $this->successResponse($request->user(), ResponseAlias::HTTP_OK);
     }
 }

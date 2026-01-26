@@ -1,0 +1,32 @@
+meta {
+  name: Create new post
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/admin/posts
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: 3|HtM69NgGKTpmmPIBn1Zc2FhHvpk2FtKgdcYbpry3d059f93a
+}
+
+body:json {
+  {
+      "title": "My New Post",
+      "body": "Content here...",
+      "status": "published",
+      "taxonomies": [
+          { "id": 1, "type": "category", "primary": true },
+          { "id": 5, "type": "tag", "primary": false }
+      ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

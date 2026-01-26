@@ -5,11 +5,16 @@ meta {
 }
 
 get {
-  url: 
+  url: {{baseUrl}}/api/me
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: 3|HtM69NgGKTpmmPIBn1Zc2FhHvpk2FtKgdcYbpry3d059f93a
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

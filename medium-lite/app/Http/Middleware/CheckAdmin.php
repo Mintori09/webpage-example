@@ -18,11 +18,10 @@ class CheckAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        if (!$request->user() && request()->role() === 'admin') {
+        if ($request->user() && $request->user()->role === 'admin') {
             return $next($request);
         }
 
-        return $this->errorResponse('Unauthenticated.', Response::HTTP_UNAUTHORIZED);
+        return $this->errorResponse('Unauthorized. Admin access required.', Response::HTTP_FORBIDDEN);
     }
 }
