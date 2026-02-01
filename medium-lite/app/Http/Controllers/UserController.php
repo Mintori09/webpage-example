@@ -14,59 +14,105 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 class UserController extends Controller
 {
     use ApiResponser;
-    public function login(Request $request): JsonResponse {
-        $attr = $request->validate([
-            'email' => 'required|string|email',
-            "password" => 'required|string'
-        ]);
-        $user = User::where('email', $attr['email'])->first();
 
-        if (!$user || Hash::check($attr['password'] . $user->password, $user->password === false) ){
-            return $this->errorResponse('Credentials do not match', ResponseAlias::HTTP_UNAUTHORIZED);
+    public function login(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            "email" => "required|string|email",
+            "password" => "required|string",
+        ]);
+
+        $user = User::query()->where("email", $validated["email"])->first();
+
+        if (!$user || !Hash::check($validated["password"], $user->password)) {
+            return $this->errorResponse(
+                "Credentials do not match",
+                ResponseAlias::HTTP_UNAUTHORIZED,
+            );
         }
 
-        $data = [
-            'token' => $user->createToken($attr['email'])->plainTextToken,
-            'user' => $user
-        ];
-        return $this->successResponse($data, ResponseAlias::HTTP_OK);
+        $token = $user->createToken("auth_token")->plainTextToken;
+
+        return $this->successResponse(
+            [
+                "token" => $token,
+                "user" => $user,
+            ],
+            "Login successfully",
+        );
     }
 
-    public function registry(Request $request): JsonResponse {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    public function registry(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            "name" => ["required", "string", "max:255"],
+            "email" => [
+                "required",
+                "string",
+                "email",
+                "max:255",
+                "unique:users",
+            ],
+            "password" => ["required", "confirmed", Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        $user = User::query()->create([
+            "name" => $validated["name"],
+            "email" => $validated["email"],
+            "password" => Hash::make($validated["password"]),
         ]);
 
-        $token = $user->createToken($request->email)->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
-        return $this->successResponse([
-            'token' => $token,
-            'user' => $user,
-            'message' => "Register successfully"
-        ], Response::HTTP_CREATED);
+        return $this->successResponse(
+            [
+                "token" => $token,
+                "user" => $user,
+            ],
+            "Register successfully",
+            Response::HTTP_CREATED,
+        );
     }
 
-    public function logout(Request $request) : JsonResponse {
-        if ($request->user()) {
-            $request->user()->currentAccessToken()->delete();
-            return $this->successResponse([
-                'message' => "Logged out successfully"
-            ], ResponseAlias::HTTP_OK);
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->successResponse(null, "Logged out successfully");
+    }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            "old_password" => ["required", Rules\Password::defaults()],
+            "new_password" => [
+                "required",
+                "confirmed",
+                Rules\Password::defaults(),
+            ],
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($validated["old_password"], $user->password)) {
+            return $this->errorResponse(
+                "Old password does not match",
+                ResponseAlias::HTTP_UNPROCESSABLE_ENTITY,
+            );
         }
-        return $this->errorResponse([
-            'message' => 'Unauthenticated'
-        ], ResponseAlias::HTTP_UNAUTHORIZED);
+
+        $user->update([
+            "password" => Hash::make($validated["new_password"]),
+        ]);
+
+        return $this->successResponse(null, "Update password successfully");
     }
 
-    public function profile(Request $request): JsonResponse {
-        return $this->successResponse($request->user(), ResponseAlias::HTTP_OK);
+    public function profile(Request $request): JsonResponse
+    {
+        return $this->successResponse(
+            $request->user(),
+            "User profile retrieved successfully",
+        );
     }
 }

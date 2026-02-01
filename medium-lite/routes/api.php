@@ -8,16 +8,26 @@ use App\Http\Middleware\CheckAdmin;
 
 // {{baseUrl}}/api/...
 
-route::get('/user/login', [ usercontroller::class, 'login' ]);
-route::post('/user/registry', [ usercontroller::class, 'registry' ]);
-route::get('/posts', [ postcontroller::class, 'index' ]);
-route::get('/posts/{slug}', [ postcontroller::class, 'show' ]);
-route::get('/posts/search', [ postcontroller::class, 'search' ]);
-route::get('/users/{id}/posts', [ postcontroller::class, 'userPosts' ]);
+route::get('/user/login', [usercontroller::class, 'login']);
+route::post('/user/registry', [usercontroller::class, 'registry']);
+Route::get('/posts', [PostController::class, 'index']);
+Route::get('/posts/{slug}', [PostController::class, 'show']);
+Route::get('/posts/search', [PostController::class, 'search']);
+Route::get('/users/{id}/posts', [PostController::class, 'userPosts']);
+Route::get('/categories', [PostController::class, 'categories']);
+Route::get('/tags', [PostController::class, 'tags']);
+Route::get('/posts/{id}/comments', [PostController::class, 'comments']);
 
-route::middleware('auth:sanctum')->group(function () {
-    route::get('/me', [usercontroller::class, 'profile']);
-    route::post('/user/logout', [usercontroller::class, 'logout']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [UserController::class, 'profile']);
+    Route::post('/user/logout', [UserController::class, 'logout']);
+
+    // Protected Post Routes
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{id}', [PostController::class, 'update']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+    Route::post('/posts/{id}/comments', [PostController::class, 'storeComment']);
+    Route::post('/upload', [PostController::class, 'upload']);
 });
 
 route::middleware(['auth:sanctum', checkadmin::class])->group(function () {
