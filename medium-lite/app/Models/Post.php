@@ -14,6 +14,11 @@ class Post extends Model
 {
     protected $fillable = ['title', 'slug', 'excerpt', 'body', 'status', 'user_id', 'reading_time'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function taxonomies(): HasMany|Post
     {
         return $this->hasMany(PostTaxonomy::class, 'post_id');

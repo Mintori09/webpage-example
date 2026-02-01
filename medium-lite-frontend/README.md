@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Medium-Lite Frontend
+
+A modern, responsive blogging platform frontend built with Next.js 15 (App Router) and Tailwind CSS v4, integrated with a Laravel API backend.
+
+## Tech Stack
+- **Framework**: Next.js 15
+- **Styling**: Tailwind CSS v4
+- **Language**: TypeScript
+- **State Management**: React Context (AuthProvider) + Server Components
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+1. **Install Dependencies**
+   ```bash
+   pnpm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. **Configure API**
+   Ensure your Laravel API is running (default: `http://localhost:8000/api`).
+   If different, create a `.env.local`:
+   ```env
+   NEXT_PUBLIC_API_URL=http://your-api-url/api
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Run Development Server**
+   ```bash
+   pnpm dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Application Structure & Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application is structured using the Next.js App Router. Below is a guide to the key pages and their functionality.
 
-## Learn More
+### 1- Public Content
 
-To learn more about Next.js, take a look at the following resources:
+#### **Home Page**
+- **Path**: `/app/page.tsx`
+- **Route**: `/`
+- **Description**: The landing page of the application. It fetches the latest posts from the API and displays them in a feed alongside a sidebar of recommended topics.
+- **Key Features**: Server-side fetching, infinite scrolling hook (ready structure), responsive layout.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### **Post Detail**
+- **Path**: `/app/posts/[slug]/page.tsx`
+- **Route**: `/posts/{slug}`
+- **Description**: Displays the full content of a single story.
+- **Key Features**: 
+    - Renders rich HTML content safely.
+    - Shows author details, publication date, and reading time.
+    - Integrates the **Comments Section** at the bottom.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### **Search Results**
+- **Path**: `/app/search/page.tsx`
+- **Route**: `/search?q={query}`
+- **Description**: Displays search results based on the user's query.
+- **Key Features**: Dynamic query parameter handling, re-uses `ArticleCard` for consistency.
 
-## Deploy on Vercel
+#### **User Profile**
+- **Path**: `/app/u/[id]/page.tsx`
+- **Route**: `/u/{userId}`
+- **Description**: Public profile page for a user.
+- **Key Features**: Displays user information (avatar, name) and a list of stories published by that user.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 2- Authentication
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### **Login**
+- **Path**: `/app/(auth)/login/page.tsx`
+- **Route**: `/login`
+- **Description**: User sign-in form.
+- **Key Features**: Clients-side validation, integrates with `AuthProvider` to store Sanctum tokens in cookies.
+
+#### **Register**
+- **Path**: `/app/(auth)/register/page.tsx`
+- **Route**: `/register`
+- **Description**: New user registration form.
+- **Key Features**: Form validation (password confirmation), auto-login upon successful registration.
+
+### 3- Writer Experience (Protected)
+
+#### **New Story (Editor)**
+- **Path**: `/app/new-story/page.tsx`
+- **Route**: `/new-story`
+- **Description**: The writing interface.
+- **Key Features**: 
+    - Clean, distraction-free writing environment.
+    - Title and Body inputs.
+    - Category selection.
+    - Publishing functionality (creates `published` post via API).
+    - Protected route (redirects to login if unauthenticated).
+
+#### **My Stories (Dashboard)**
+- **Path**: `/app/me/stories/page.tsx`
+- **Route**: `/me/stories`
+- **Description**: Dashboard for the logged-in user to manage their content.
+- **Key Features**: 
+    - Lists all posts authored by the current user.
+    - Delete functionality.
+    - Edit links (hooks provided).
+
+## Key Components
+
+- **Navbar** (`components/Navbar.tsx`): Sticky header with search, write link, and user dropdown menu. Handles auth state display.
+- **Sidebar** (`components/Sidebar.tsx`): Displays recommended topics (categories) and other side content.
+- **ArticleCard** (`components/ArticleCard.tsx`): Reusable component to display a post summary (title, excerpt, author, thumbnail) in lists.
+- **CommentsSection** (`components/CommentsSection.tsx`): Handles fetching and posting comments for a specific article.
+- **AuthProvider** (`context/AuthProvider.tsx`): Global context provider that manages `user` state and handles Login/Register/Logout logic.

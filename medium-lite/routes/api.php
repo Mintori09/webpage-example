@@ -8,7 +8,7 @@ use App\Http\Middleware\CheckAdmin;
 
 // {{baseUrl}}/api/...
 
-route::get('/user/login', [usercontroller::class, 'login']);
+route::post('/user/login', [usercontroller::class, 'login']);
 route::post('/user/registry', [usercontroller::class, 'registry']);
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{slug}', [PostController::class, 'show']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Traits\ApiResponser;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,7 +17,7 @@ class PostController extends Controller
     /**
      * @throws \Throwable
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
             "title" => "required|string|max:255",
@@ -39,14 +40,12 @@ class PostController extends Controller
             ]);
 
             if ($request->has("taxonomies")) {
-                // Delete existing taxonomies for this post
                 $post->taxonomies()->delete();
 
-                // Create new taxonomy relationships
                 foreach ($request->taxonomies as $item) {
                     $post->taxonomies()->create([
                         "taxonomy_id" => $item["id"],
-                        "taxonomy_type" => $item["type"], // 'category' or 'tag'
+                        "taxonomy_type" => $item["type"],
                         "primary" => $item["primary"] ?? false,
                     ]);
                 }
@@ -71,12 +70,9 @@ class PostController extends Controller
         return DB::transaction(function () use ($request, $post) {
             $post->update($request->only(["title", "body", "status"]));
 
-            // Cập nhật lại Taxonomy nếu có gửi lên
             if ($request->has("taxonomies")) {
-                // Delete existing taxonomies for this post
                 $post->taxonomies()->delete();
 
-                // Create new taxonomy relationships
                 foreach ($request->taxonomies as $item) {
                     $post->taxonomies()->create([
                         "taxonomy_id" => $item["id"],
@@ -102,7 +98,7 @@ class PostController extends Controller
         });
     }
 
-    private function calculateReadingTime($text)
+    private function calculateReadingTime($text): int
     {
         $wordsPerMinute = 200;
         $wordCount = str_word_count(strip_tags($text));
